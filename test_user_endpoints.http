@@ -1,0 +1,58 @@
+### Pruebas con curl para los endpoints de usuarios
+
+# 1. Registrar usuario
+curl -X POST http://localhost:3000/api/users/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ci": "12345678",
+    "first_name": "Juan",
+    "last_name": "Pérez",
+    "username": "juanp",
+    "email": "juan.perez@example.com",
+    "phone": "+584121234567",
+    "user_type": "admin",
+    "password": "Password123!"
+  }'
+
+# 2. Login usuario
+curl -X POST http://localhost:3000/api/users/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ci": "12345678",
+    "password": "Password123!"
+  }'
+
+# 3. Obtener todos los usuarios (requiere token si está protegido)
+curl -X GET http://localhost:3000/api/users/ \
+  -H "Authorization: Bearer <TOKEN>"
+
+# 4. Obtener usuario por CI
+curl -X GET http://localhost:3000/api/users/12345678 \
+  -H "Authorization: Bearer <TOKEN>"
+
+# 5. Actualizar usuario
+curl -X PUT http://localhost:3000/api/users/12345678 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
+    "first_name": "Juan Carlos",
+    "last_name": "Pérez",
+    "username": "juanp",
+    "phone": "+584121234567",
+    "user_type": "admin",
+    "is_active": true
+  }'
+
+# 6. Eliminar usuario (soft delete)
+curl -X DELETE http://localhost:3000/api/users/12345678 \
+  -H "Authorization: Bearer <TOKEN>"
+
+# 7. Restaurar usuario
+curl -X PATCH http://localhost:3000/api/users/12345678/restore \
+  -H "Authorization: Bearer <TOKEN>"
+
+# 8. Buscar usuario por email
+curl -X GET http://localhost:3000/api/users/email/juan.perez@example.com \
+  -H "Authorization: Bearer <TOKEN>"
+
+# Reemplaza <TOKEN> por el token JWT recibido al hacer login.
