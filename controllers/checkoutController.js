@@ -1,4 +1,3 @@
-// controllers/checkoutController.js
 const Checkout = require('../models/checkoutModel');
 
 const createCheckout = async (req, res) => {

@@ -55,7 +55,7 @@ const swaggerDefinition = {
 
 const options = {
   swaggerDefinition,
-  apis: ['./swagger/user.yaml'], // Ahora la documentación de usuarios está en swagger/user.yaml
+  apis: ['./swagger/user.yaml'],
 };
 
 const swaggerSpec = swaggerJSDoc(options);

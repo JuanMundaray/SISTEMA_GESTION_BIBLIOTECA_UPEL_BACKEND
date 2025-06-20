@@ -18,7 +18,7 @@ const createBook = async (req, res) => {
       return res.status(400).json({ error: 'Faltan campos obligatorios (name, author, isbn)' });
     }
 
-    const nuevoLibro = await Libro.create({
+    const nuevoLibro = await book.create({
       name,
       author,
       isbn,
@@ -37,16 +37,9 @@ const createBook = async (req, res) => {
   }
 };
 
-/**
- * Obtiene todos los libros.
- * @route GET /api/book
- * @param {Object} req - Objeto de solicitud Express
- * @param {Object} res - Objeto de respuesta Express
- * @returns {Object} 200 - Lista de libros
- */
 const getAllBooks = async (req, res) => {
   try {
-    const libros = await Libro.findAll();
+    const libros = await book.findAll();
     res.json(libros);
   } catch (error) {
     console.error('Error al obtener libros:', error);
@@ -54,18 +47,10 @@ const getAllBooks = async (req, res) => {
   }
 };
 
-/**
- * Obtiene un libro por ISBN.
- * @route GET /api/book/:isbn
- * @param {Object} req - Objeto de solicitud Express
- * @param {Object} res - Objeto de respuesta Express
- * @returns {Object} 200 - Libro encontrado
- * @returns {Object} 404 - Libro no encontrado
- */
 const getBookISBN = async (req, res) => {
   try {
     const { isbn } = req.params;
-    const libro = await Libro.findByISBN(isbn);
+    const libro = await book.findByISBN(isbn);
 
     if (!libro) {
       return res.status(404).json({ error: 'Libro no encontrado' });
@@ -78,14 +63,6 @@ const getBookISBN = async (req, res) => {
   }
 };
 
-/**
- * Busca libros por título (búsqueda parcial).
- * @route GET /api/book?titulo=xxx
- * @param {Object} req - Objeto de solicitud Express
- * @param {Object} res - Objeto de respuesta Express
- * @returns {Object} 200 - Lista de libros encontrados
- * @returns {Object} 400 - Falta parámetro de búsqueda
- */
 const getBookTitle = async (req, res) => {
   try {
     const { titulo } = req.query;
@@ -94,7 +71,7 @@ const getBookTitle = async (req, res) => {
       return res.status(400).json({ error: 'Parámetro "titulo" requerido' });
     }
 
-    const libros = await Libro.searchByTitle(titulo);
+    const libros = await book.searchByTitle(titulo);
     res.json(libros);
   } catch (error) {
     console.error('Error al buscar libros por título:', error);
@@ -102,14 +79,6 @@ const getBookTitle = async (req, res) => {
   }
 };
 
-/**
- * Actualiza la disponibilidad de un libro.
- * @route PUT /api/book/:id
- * @param {Object} req - Objeto de solicitud Express
- * @param {Object} res - Objeto de respuesta Express
- * @returns {Object} 200 - Libro actualizado
- * @returns {Object} 404 - Libro no encontrado
- */
 const updateBook = async (req, res) => {
   try {
     const { id } = req.params;
@@ -119,7 +88,7 @@ const updateBook = async (req, res) => {
       return res.status(400).json({ error: 'El campo "available" debe ser booleano' });
     }
 
-    const libroActualizado = await Libro.updateAvailability(id, available);
+    const libroActualizado = await bookupdateAvailability(id, available);
     
     if (!libroActualizado) {
       return res.status(404).json({ error: 'Libro no encontrado' });
@@ -132,18 +101,10 @@ const updateBook = async (req, res) => {
   }
 };
 
-/**
- * Elimina un libro.
- * @route DELETE /api/book/:id
- * @param {Object} req - Objeto de solicitud Express
- * @param {Object} res - Objeto de respuesta Express
- * @returns {Object} 200 - Libro eliminado correctamente
- * @returns {Object} 404 - Libro no encontrado
- */
 const deleteBook = async (req, res) => {
   try {
     const { id } = req.params;
-    const libroEliminado = await Libro.delete(id);
+    const libroEliminado = await bookdelete(id);
 
     if (!libroEliminado) {
       return res.status(404).json({ error: 'Libro no encontrado' });

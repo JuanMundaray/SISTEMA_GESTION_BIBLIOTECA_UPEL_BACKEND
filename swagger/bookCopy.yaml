@@ -1,0 +1,99 @@
+openapi: 3.0.3
+info:
+  title: API Biblioteca UPEL - Copias de Libros
+  version: 1.0.0
+  description: Documentación de la API de gestión de copias de libros de la biblioteca UPEL
+servers:
+  - url: http://localhost:3000
+paths:
+  /book-copies:
+    get:
+      summary: Obtener todas las copias de libros
+      tags: [BookCopies]
+      responses:
+        200:
+          description: Lista de copias de libros
+    post:
+      summary: Crear una nueva copia de libro
+      tags: [BookCopies]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookCopyInput'
+      responses:
+        201:
+          description: Copia de libro creada
+        400:
+          description: Error de validación
+  /book-copies/{id}:
+    get:
+      summary: Obtener una copia de libro por ID
+      tags: [BookCopies]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Copia de libro encontrada
+        404:
+          description: Copia de libro no encontrada
+    put:
+      summary: Actualizar una copia de libro
+      tags: [BookCopies]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookCopyInput'
+      responses:
+        200:
+          description: Copia de libro actualizada
+        400:
+          description: Error de validación
+        404:
+          description: Copia de libro no encontrada
+    delete:
+      summary: Eliminar una copia de libro
+      tags: [BookCopies]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Copia de libro eliminada
+        404:
+          description: Copia de libro no encontrada
+components:
+  schemas:
+    BookCopyInput:
+      type: object
+      required:
+        - book_id
+        - barcode
+        - location
+        - status
+      properties:
+        book_id:
+          type: integer
+        barcode:
+          type: string
+        location:
+          type: string
+        status:
+          type: string
+          enum: [available, checked_out, reserved, lost, damaged]

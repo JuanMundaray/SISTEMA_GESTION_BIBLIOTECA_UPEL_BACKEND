@@ -1,0 +1,109 @@
+openapi: 3.0.3
+info:
+  title: API Biblioteca UPEL - Libros
+  version: 1.0.0
+  description: Documentación de la API de gestión de libros de la biblioteca UPEL
+servers:
+  - url: http://localhost:3000
+paths:
+  /books:
+    get:
+      summary: Obtener todos los libros
+      tags: [Books]
+      responses:
+        200:
+          description: Lista de libros
+    post:
+      summary: Crear un nuevo libro
+      tags: [Books]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookInput'
+      responses:
+        201:
+          description: Libro creado
+        400:
+          description: Error de validación
+  /books/{id}:
+    get:
+      summary: Obtener un libro por ID
+      tags: [Books]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Libro encontrado
+        404:
+          description: Libro no encontrado
+    put:
+      summary: Actualizar un libro
+      tags: [Books]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookInput'
+      responses:
+        200:
+          description: Libro actualizado
+        400:
+          description: Error de validación
+        404:
+          description: Libro no encontrado
+    delete:
+      summary: Eliminar un libro
+      tags: [Books]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Libro eliminado
+        404:
+          description: Libro no encontrado
+components:
+  schemas:
+    BookInput:
+      type: object
+      required:
+        - title
+        - author
+        - isbn
+        - publisher
+        - publication_year
+      properties:
+        title:
+          type: string
+        author:
+          type: string
+        isbn:
+          type: string
+        publisher:
+          type: string
+        publication_year:
+          type: integer
+        edition:
+          type: string
+        language:
+          type: string
+        description:
+          type: string
+        academic_program_id:
+          type: integer

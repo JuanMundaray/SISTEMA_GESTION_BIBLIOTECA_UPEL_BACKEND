@@ -48,9 +48,11 @@ const registerSchema = Joi.object({
         'string.max': 'La contraseña no puede exceder los 30 caracteres',
         'string.pattern.base': 'La contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial (!@#$%^&*)'
     }),
-  user_type: Joi.string().valid('student', 'professor', 'admin').default('student')
+  user_type_id: Joi.number().integer().positive().required()
     .messages({
-        'any.only': 'El tipo de usuario debe ser student, professor o admin'
+        'number.base': 'El tipo de usuario debe ser un número entero (user_type_id)',
+        'number.positive': 'El tipo de usuario debe ser un id válido',
+        'any.required': 'El tipo de usuario es requerido'
     })
 });
 

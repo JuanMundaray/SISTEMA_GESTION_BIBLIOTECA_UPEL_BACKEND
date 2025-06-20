@@ -1,0 +1,106 @@
+openapi: 3.0.3
+info:
+  title: API Biblioteca UPEL - Préstamos
+  version: 1.0.0
+  description: Documentación de la API de gestión de préstamos (checkouts) de la biblioteca UPEL
+servers:
+  - url: http://localhost:3000
+paths:
+  /checkouts:
+    get:
+      summary: Obtener todos los préstamos
+      tags: [Checkouts]
+      responses:
+        200:
+          description: Lista de préstamos
+    post:
+      summary: Crear un nuevo préstamo
+      tags: [Checkouts]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckoutInput'
+      responses:
+        201:
+          description: Préstamo creado
+        400:
+          description: Error de validación
+  /checkouts/{id}:
+    get:
+      summary: Obtener un préstamo por ID
+      tags: [Checkouts]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Préstamo encontrado
+        404:
+          description: Préstamo no encontrado
+    put:
+      summary: Actualizar un préstamo
+      tags: [Checkouts]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckoutUpdate'
+      responses:
+        200:
+          description: Préstamo actualizado
+        400:
+          description: Error de validación
+        404:
+          description: Préstamo no encontrado
+    delete:
+      summary: Eliminar un préstamo
+      tags: [Checkouts]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Préstamo eliminado
+        404:
+          description: Préstamo no encontrado
+components:
+  schemas:
+    CheckoutInput:
+      type: object
+      required:
+        - copy_id
+        - user_id
+        - due_date
+      properties:
+        copy_id:
+          type: integer
+        user_id:
+          type: integer
+        due_date:
+          type: string
+          format: date
+    CheckoutUpdate:
+      type: object
+      properties:
+        return_date:
+          type: string
+          format: date
+        status:
+          type: string
+        fine_amount:
+          type: number

@@ -2,30 +2,30 @@
 const pool = require('../config/db');
 
 const DigitalResource = {
-  async create({ title, url, description, type }) {
+  async create({ book_id, title, author, url, type, upload_date }) {
     const result = await pool.query(
-      `INSERT INTO digital_resources (title, url, description, type) VALUES ($1, $2, $3, $4) RETURNING *`,
-      [title, url, description, type]
+      `INSERT INTO upel_library.digital_resources (book_id, title, author, url, type, upload_date) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [book_id, title, author, url, type, upload_date]
     );
     return result.rows[0];
   },
   async findAll() {
-    const result = await pool.query('SELECT * FROM digital_resources');
+    const result = await pool.query('SELECT * FROM upel_library.digital_resources');
     return result.rows;
   },
   async findById(resource_id) {
-    const result = await pool.query('SELECT * FROM digital_resources WHERE resource_id = $1', [resource_id]);
+    const result = await pool.query('SELECT * FROM upel_library.digital_resources WHERE resource_id = $1', [resource_id]);
     return result.rows[0];
   },
-  async update(resource_id, { title, url, description, type }) {
+  async update(resource_id, { book_id, title, author, url, type, upload_date }) {
     const result = await pool.query(
-      `UPDATE digital_resources SET title = $1, url = $2, description = $3, type = $4, updated_at = NOW() WHERE resource_id = $5 RETURNING *`,
-      [title, url, description, type, resource_id]
+      `UPDATE upel_library.digital_resources SET book_id = $1, title = $2, author = $3, url = $4, type = $5, upload_date = $6, updated_at = NOW() WHERE resource_id = $7 RETURNING *`,
+      [book_id, title, author, url, type, upload_date, resource_id]
     );
     return result.rows[0];
   },
   async delete(resource_id) {
-    const result = await pool.query('DELETE FROM digital_resources WHERE resource_id = $1 RETURNING *', [resource_id]);
+    const result = await pool.query('DELETE FROM upel_library.digital_resources WHERE resource_id = $1 RETURNING *', [resource_id]);
     return result.rows[0];
   }
 };

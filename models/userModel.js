@@ -2,13 +2,13 @@ const pool = require('../config/db');
 
 const UserModel = {
   // Crear usuario
-  async create({ci, first_name, last_name, username, email, phone, user_type, password }) {
+  async create({ci, first_name, last_name, username, email, phone, user_type_id, password }) {
     const result = await pool.query(
       `INSERT INTO upel_library.users (
-        ci, first_name, last_name, username, email, phone, user_type, password, is_active
+        ci, first_name, last_name, username, email, phone, user_type_id, password, is_active
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
-      RETURNING id, ci, first_name, last_name, username, email, phone, user_type, is_active`,
-      [ci, first_name, last_name, username, email, phone, user_type, password, true]
+      RETURNING user_id, ci, first_name, last_name, username, email, phone, user_type_id, is_active`,
+      [ci, first_name, last_name, username, email, phone, user_type_id, password, true]
     );
     return result.rows[0];
   },
@@ -21,7 +21,7 @@ const UserModel = {
     );
     return result.rows[0];
   },
-  // Buscar por email (para login)
+  // Buscar por CI
   async findByCI(ci) {
     const result = await pool.query(
       'SELECT * FROM upel_library.users WHERE ci = $1 AND deleted_at IS NULL',
@@ -33,7 +33,7 @@ const UserModel = {
   // Obtener todos los usuarios (paginados)
   async getAll(limit, offset) {
     const usersQuery = pool.query(
-      `SELECT id, ci, first_name, last_name, username, email, phone, user_type, is_active 
+      `SELECT user_id, ci, first_name, last_name, username, email, phone, user_type_id, is_active 
        FROM upel_library.users 
        WHERE deleted_at IS NULL 
        ORDER BY created_at DESC 
@@ -54,13 +54,13 @@ const UserModel = {
   },
 
   // Actualizar usuario
-  async update(ci, { first_name, last_name, username, phone, user_type, is_active }) {
+  async update(ci, { first_name, last_name, username, phone, user_type_id, is_active }) {
     const result = await pool.query(
       `UPDATE upel_library.users 
-       SET first_name = $1, last_name = $2, username = $3, phone = $4, user_type = $5, is_active = $6 
+       SET first_name = $1, last_name = $2, username = $3, phone = $4, user_type_id = $5, is_active = $6 
        WHERE ci = $7 AND deleted_at IS NULL 
-       RETURNING ci, first_name, last_name, username, email, phone, user_type, is_active`,
-      [first_name, last_name, username, phone, user_type, is_active, ci]
+       RETURNING ci, first_name, last_name, username, email, phone, user_type_id, is_active`,
+      [first_name, last_name, username, phone, user_type_id, is_active, ci]
     );
     return result.rows[0];
   },

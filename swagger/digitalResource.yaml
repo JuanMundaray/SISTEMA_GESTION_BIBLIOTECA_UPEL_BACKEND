@@ -1,0 +1,103 @@
+openapi: 3.0.3
+info:
+  title: API Biblioteca UPEL - Recursos Digitales
+  version: 1.0.0
+  description: Documentación de la API de gestión de recursos digitales de la biblioteca UPEL
+servers:
+  - url: http://localhost:3000
+paths:
+  /digital-resources:
+    get:
+      summary: Obtener todos los recursos digitales
+      tags: [DigitalResources]
+      responses:
+        200:
+          description: Lista de recursos digitales
+    post:
+      summary: Crear un nuevo recurso digital
+      tags: [DigitalResources]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DigitalResourceInput'
+      responses:
+        201:
+          description: Recurso digital creado
+        400:
+          description: Error de validación
+  /digital-resources/{id}:
+    get:
+      summary: Obtener un recurso digital por ID
+      tags: [DigitalResources]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Recurso digital encontrado
+        404:
+          description: Recurso digital no encontrado
+    put:
+      summary: Actualizar un recurso digital
+      tags: [DigitalResources]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DigitalResourceInput'
+      responses:
+        200:
+          description: Recurso digital actualizado
+        400:
+          description: Error de validación
+        404:
+          description: Recurso digital no encontrado
+    delete:
+      summary: Eliminar un recurso digital
+      tags: [DigitalResources]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Recurso digital eliminado
+        404:
+          description: Recurso digital no encontrado
+components:
+  schemas:
+    DigitalResourceInput:
+      type: object
+      required:
+        - title
+        - url
+        - type
+      properties:
+        book_id:
+          type: integer
+        title:
+          type: string
+        author:
+          type: string
+        url:
+          type: string
+        type:
+          type: string
+          enum: [ebook, article, thesis]
+        upload_date:
+          type: string
+          format: date

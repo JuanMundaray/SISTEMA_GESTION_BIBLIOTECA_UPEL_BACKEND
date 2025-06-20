@@ -2,8 +2,10 @@ const UserModel = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { normalizeVenezuelanPhoneNumber } = require('../utils/phoneNumberNormalize');
-const { registerSchema, loginSchema, validate } = require('../validators/userValidator');
+const registerSchema = require('../schema/registerSchema');
+const loginSchema = require('../schema/loginSchema');
 const { ciParamSchema, emailParamSchema } = require('../schema/paramUserSchemas');
+const { validate } = require('../validators/validator');
 require('dotenv').config();
 
 // Helpers (manejo de errores y respuestas)
@@ -16,8 +18,9 @@ const registerUser = async (req, res) => {
   try {
     const phoneNumber = await normalizeVenezuelanPhoneNumber(req.body.phone);
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    const userData = { ...req.body, password: hashedPassword, phone:phoneNumber};
-    
+    // Adaptar a user_type_id
+    const userData = { ...req.body, password: hashedPassword, phone: phoneNumber };
+    // El modelo debe aceptar user_type_id
     const newUser = await UserModel.create(userData);
     res.status(201).json({
       message: 'Usuario registrado exitosamente',
@@ -110,31 +113,23 @@ const findByCiUser = async (req, res) => {
   // Actualizar un usuario
   const updateUser = async (req, res) => {
     try {
-      // Validar los datos de entrada
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
-
+      // Validar los datos de entrada (Joi ya lo hace por middleware)
       const { ci } = req.params;
-      const { first_name, last_name, username, phone, user_type, is_active } = req.body;
-
+      const { first_name, last_name, username, phone, user_type_id, is_active } = req.body;
       // Verificar si el usuario existe
       const existingUser = await UserModel.findByCI(ci);
       if (!existingUser) {
         return res.status(404).json({ message: 'Usuario no encontrado' });
       }
-
       // Actualizar el usuario
       const updatedUser = await UserModel.update(ci, {
         first_name,
         last_name,
         username,
         phone,
-        user_type,
+        user_type_id,
         is_active
       });
-
       res.json({
         message: 'Usuario actualizado exitosamente',
         user: updatedUser
@@ -216,11 +211,11 @@ const findByCiUser = async (req, res) => {
 // ... (otros métodos del controller actualizados para usar UserModel)
 
 module.exports = {
-  registerUser: [validate(registerSchema), registerUser],
-  loginUser: [validate(loginSchema), loginUser],
+  registerUser,
+  loginUser,
   getAllUsers,
-  findByCiUser: [validate(ciParamSchema), findByCiUser],
-  findByEmailUser: [validate(emailParamSchema), findByEmailUser],
+  findByCiUser,
+  findByEmailUser,
   restoreUser,
   updateUser,
   deleteUser

@@ -1,0 +1,118 @@
+openapi: 3.0.3
+info:
+  title: API Biblioteca UPEL - Multas
+  version: 1.0.0
+  description: Documentación de la API de gestión de multas de la biblioteca UPEL
+servers:
+  - url: http://localhost:3000
+paths:
+  /fines:
+    get:
+      summary: Obtener todas las multas
+      tags: [Fines]
+      responses:
+        200:
+          description: Lista de multas
+    post:
+      summary: Crear una nueva multa
+      tags: [Fines]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FineInput'
+      responses:
+        201:
+          description: Multa creada
+        400:
+          description: Error de validación
+  /fines/{id}:
+    get:
+      summary: Obtener una multa por ID
+      tags: [Fines]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Multa encontrada
+        404:
+          description: Multa no encontrada
+    put:
+      summary: Actualizar una multa
+      tags: [Fines]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FineUpdate'
+      responses:
+        200:
+          description: Multa actualizada
+        400:
+          description: Error de validación
+        404:
+          description: Multa no encontrada
+    delete:
+      summary: Eliminar una multa
+      tags: [Fines]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Multa eliminada
+        404:
+          description: Multa no encontrada
+components:
+  schemas:
+    FineInput:
+      type: object
+      required:
+        - user_id
+        - checkout_id
+        - amount
+        - reason
+      properties:
+        user_id:
+          type: integer
+        checkout_id:
+          type: integer
+        amount:
+          type: number
+        reason:
+          type: string
+        issue_date:
+          type: string
+          format: date
+        is_paid:
+          type: boolean
+        payment_date:
+          type: string
+          format: date
+    FineUpdate:
+      type: object
+      properties:
+        amount:
+          type: number
+        reason:
+          type: string
+        is_paid:
+          type: boolean
+        payment_date:
+          type: string
+          format: date

@@ -1,0 +1,113 @@
+openapi: 3.0.3
+info:
+  title: API Biblioteca UPEL - Reservas de Espacios
+  version: 1.0.0
+  description: Documentación de la API de gestión de reservas de espacios de la biblioteca UPEL
+servers:
+  - url: http://localhost:3000
+paths:
+  /space-reservations:
+    get:
+      summary: Obtener todas las reservas de espacios
+      tags: [SpaceReservations]
+      responses:
+        200:
+          description: Lista de reservas de espacios
+    post:
+      summary: Crear una nueva reserva de espacio
+      tags: [SpaceReservations]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpaceReservationInput'
+      responses:
+        201:
+          description: Reserva creada
+        400:
+          description: Error de validación
+  /space-reservations/{id}:
+    get:
+      summary: Obtener una reserva de espacio por ID
+      tags: [SpaceReservations]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Reserva encontrada
+        404:
+          description: Reserva no encontrada
+    put:
+      summary: Actualizar una reserva de espacio
+      tags: [SpaceReservations]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpaceReservationUpdate'
+      responses:
+        200:
+          description: Reserva actualizada
+        400:
+          description: Error de validación
+        404:
+          description: Reserva no encontrada
+    delete:
+      summary: Eliminar una reserva de espacio
+      tags: [SpaceReservations]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Reserva eliminada
+        404:
+          description: Reserva no encontrada
+components:
+  schemas:
+    SpaceReservationInput:
+      type: object
+      required:
+        - space_id
+        - user_id
+        - start_time
+        - end_time
+      properties:
+        space_id:
+          type: integer
+        user_id:
+          type: integer
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+        purpose:
+          type: string
+    SpaceReservationUpdate:
+      type: object
+      properties:
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+        purpose:
+          type: string

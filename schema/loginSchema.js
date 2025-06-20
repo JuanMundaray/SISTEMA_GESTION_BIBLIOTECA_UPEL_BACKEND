@@ -9,9 +9,13 @@ const loginSchema = Joi.object({
         'string.max': 'El número de cedula es demasiado largo',
         'string.pattern.base': 'La cedula solo puede tener números'
     }),
-  password: Joi.string().required()
+  password: Joi.string().min(8).max(30).required()
+    .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])'))
     .messages({
-      'string.empty': 'La contraseña es requerida'
+      'string.empty': 'La contraseña es requerida',
+      'string.min': 'La contraseña debe tener al menos 8 caracteres',
+      'string.max': 'La contraseña no puede exceder los 30 caracteres',
+      'string.pattern.base': 'La contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial (!@#$%^&*)'
     })
 });
 

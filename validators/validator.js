@@ -1,7 +1,4 @@
-const registerSchema = require('../schema/registerSchema');
-const loginSchema = require('../schema/loginSchema');
-
-// Middleware de validación
+// Middleware de validación universal
 const validate = (schema) => (req, res, next) => {
   const { error } = schema.validate(req.body, { abortEarly: false });
   if (error) {
@@ -15,7 +12,5 @@ const validate = (schema) => (req, res, next) => {
 };
 
 module.exports = {
-  registerSchema,
-  loginSchema,
   validate
 };

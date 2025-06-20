@@ -1,0 +1,96 @@
+openapi: 3.0.3
+info:
+  title: API Biblioteca UPEL - Espacios
+  version: 1.0.0
+  description: Documentación de la API de gestión de espacios de la biblioteca UPEL
+servers:
+  - url: http://localhost:3000
+paths:
+  /spaces:
+    get:
+      summary: Obtener todos los espacios
+      tags: [Spaces]
+      responses:
+        200:
+          description: Lista de espacios
+    post:
+      summary: Crear un nuevo espacio
+      tags: [Spaces]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpaceInput'
+      responses:
+        201:
+          description: Espacio creado
+        400:
+          description: Error de validación
+  /spaces/{id}:
+    get:
+      summary: Obtener un espacio por ID
+      tags: [Spaces]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Espacio encontrado
+        404:
+          description: Espacio no encontrado
+    put:
+      summary: Actualizar un espacio
+      tags: [Spaces]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpaceInput'
+      responses:
+        200:
+          description: Espacio actualizado
+        400:
+          description: Error de validación
+        404:
+          description: Espacio no encontrado
+    delete:
+      summary: Eliminar un espacio
+      tags: [Spaces]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Espacio eliminado
+        404:
+          description: Espacio no encontrado
+components:
+  schemas:
+    SpaceInput:
+      type: object
+      required:
+        - name
+        - capacity
+        - type
+      properties:
+        name:
+          type: string
+        capacity:
+          type: integer
+        type:
+          type: string
+          enum: [study_room, auditorium, cubicle]

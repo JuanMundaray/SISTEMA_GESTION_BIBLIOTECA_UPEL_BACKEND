@@ -1,4 +1,3 @@
-// controllers/bookCopyController.js
 const BookCopy = require('../models/bookCopyModel');
 
 const createBookCopy = async (req, res) => {
