@@ -19,10 +19,26 @@ paths:
               properties:
                 ci:
                   type: string
-                  example: "12345678"
+                  example: "311574308" # admin
                 password:
                   type: string
-                  example: "Password123!"
+                  example: "AdminUPEL2025!" # admin
+            examples:
+              admin:
+                summary: Admin
+                value:
+                  ci: "311574308"
+                  password: "AdminUPEL2025!"
+              student:
+                summary: Student
+                value:
+                  ci: "10102030"
+                  password: "StudentUPEL2025!"
+              professor:
+                summary: Professor
+                value:
+                  ci: "11111111"
+                  password: "ProfessorUPEL2025!"
       responses:
         200:
           description: Login exitoso
@@ -39,8 +55,10 @@ paths:
           description: Credenciales inválidas
   /users:
     post:
-      summary: Registrar usuario
+      summary: Registrar usuario (solo admin)
       tags: [Users]
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -50,47 +68,70 @@ paths:
               properties:
                 ci:
                   type: string
+                  example: "311574308"
                 first_name:
                   type: string
+                  example: "Juan"
                 last_name:
                   type: string
+                  example: "Pérez"
                 username:
                   type: string
+                  example: "juanperez123"
                 email:
                   type: string
+                  example: "juan.perez@upel.edu.ve"
                 phone:
                   type: string
-                user_type:
-                  type: string
-                  enum: [student, professor, admin]
+                  example: "+5804121234567"
+                user_type_id:
+                  type: number
+                  example: 1
                 password:
                   type: string
+                  example: "Upel1234!"
       responses:
         201:
           description: Usuario creado
         400:
           description: Error de validación o email duplicado
     get:
-      summary: Obtener usuarios paginados
+      summary: Obtener usuarios paginados (solo admin)
       tags: [Users]
+      security:
+        - bearerAuth: []
       parameters:
         - in: query
           name: page
           schema:
             type: integer
           description: Número de página
+          example: 1
         - in: query
           name: limit
           schema:
             type: integer
           description: Cantidad de usuarios por página
+          example: 10
       responses:
         200:
           description: Lista de usuarios y paginación
+        403:
+          description: Acceso denegado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Acceso denegado solo administradores.
   /users/{ci}:
     get:
-      summary: Obtener usuario por CI
+      summary: Obtener usuario por CI (solo admin)
       tags: [Users]
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: ci
@@ -98,14 +139,27 @@ paths:
           schema:
             type: string
           description: Cédula de identidad
+          example: "311574308"
       responses:
         200:
           description: Usuario encontrado
         404:
           description: Usuario no encontrado
+        403:
+          description: Acceso denegado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Acceso denegado solo administradores.
     put:
       summary: Actualizar usuario (solo admin)
       tags: [Users]
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: ci
@@ -127,7 +181,7 @@ paths:
                   type: string
                 phone:
                   type: string
-                user_type:
+                user_type_id:
                   type: string
                 is_active:
                   type: boolean
@@ -138,9 +192,19 @@ paths:
           description: Usuario no encontrado
         403:
           description: Acceso denegado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Acceso denegado solo administradores.
     delete:
       summary: Eliminar usuario (solo admin)
       tags: [Users]
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: ci
@@ -154,10 +218,20 @@ paths:
           description: Usuario no encontrado
         403:
           description: Acceso denegado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Acceso denegado solo administradores.
   /users/{ci}/restore:
     patch:
-      summary: Restaurar usuario
+      summary: Restaurar usuario (solo admin)
       tags: [Users]
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: ci
@@ -165,22 +239,45 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        201:
           description: Usuario restaurado
         404:
           description: Usuario no encontrado
+        403:
+          description: Acceso denegado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Acceso denegado solo administradores.
   /users/email/{email}:
     get:
-      summary: Buscar usuario por email
+      summary: Buscar usuario por email (solo admin)
       tags: [Users]
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: email
           required: true
           schema:
             type: string
+          example: "juan.perez@upel.edu.ve"
       responses:
         200:
           description: Usuario encontrado
         404:
           description: Usuario no encontrado
+        403:
+          description: Acceso denegado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Acceso denegado solo administradores.

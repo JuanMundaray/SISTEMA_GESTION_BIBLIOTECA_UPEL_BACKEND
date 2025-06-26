@@ -18,17 +18,28 @@ const registerUser = async (req, res) => {
   try {
     const phoneNumber = await normalizeVenezuelanPhoneNumber(req.body.phone);
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    // Adaptar a user_type_id
     const userData = { ...req.body, password: hashedPassword, phone: phoneNumber };
-    // El modelo debe aceptar user_type_id
     const newUser = await UserModel.create(userData);
     res.status(201).json({
       message: 'Usuario registrado exitosamente',
       user: newUser
     });
   } catch (error) {
+    console.error('Error en registro:', error); // Log completo para depuración
     if (error.code === '23505') {
-      return res.status(400).json({ message: 'El email ya está registrado' });
+      let field = 'desconocido';
+      let message = 'Ya existe un registro con ese dato único.';
+      if (error.detail && error.detail.includes('email')) {
+        field = 'email';
+        message = 'El email ya está registrado';
+      } else if (error.detail && error.detail.includes('ci')) {
+        field = 'ci';
+        message = 'La cédula ya está registrada';
+      } else if (error.detail && error.detail.includes('username')) {
+        field = 'username';
+        message = 'El nombre de usuario ya está registrado';
+      }
+      return res.status(400).json({ message, field, code: 'DUPLICATE_KEY' });
     }
     handleError(res, error);
   }
@@ -43,6 +54,7 @@ const loginUser = async (req, res) => {
     }
 
     const validPassword = await bcrypt.compare(req.body.password, user.password);
+
     if (!validPassword) {
       return res.status(401).json({ message: 'Contraseña Incorrecta' });
     }
@@ -52,7 +64,7 @@ const loginUser = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { ci: user.ci, email: user.email, user_type: user.user_type },
+      { ci: user.ci, email: user.email, user_type_id: user.user_type_id },
       process.env.JWT_SECRET,
       { expiresIn: '8h' }
     );

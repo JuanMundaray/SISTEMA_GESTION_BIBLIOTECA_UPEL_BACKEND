@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   description: Documentación de la API de gestión de espacios de la biblioteca UPEL
 servers:
-  - url: http://localhost:3000
+  - url: http://localhost:5000
 paths:
   /spaces:
     get:

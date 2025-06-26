@@ -79,7 +79,7 @@ const generateFakeUsers = async (count = 10) => {
       last_name: lastName,
       email: faker.internet.email({ firstName, lastName }).toLowerCase(),
       phone: faker.phone.number('04##%%%%%%').replace(/\D/g, ''),
-      user_type: faker.helpers.arrayElement(['student', 'professor']),
+      user_type_id: faker.helpers.arrayElement([1, 2]),
       is_active: true,
       password: defaultPassword
     });
@@ -93,10 +93,38 @@ const generateFakeUsers = async (count = 10) => {
     last_name: 'UPEL',
     email: 'admin@upel.edu.ve',
     phone: '584121878875',
-    user_type: 'admin',
+    user_type_id: 3,
     is_active: true,
     password: await hashPassword('AdminUPEL2025!')
   });
+
+  // Usuario estudent
+  users.push({
+    ci: '10102030',
+    username: 'student',
+    first_name: 'Student',
+    last_name: 'UPEL',
+    email: 'student@upel.edu.ve',
+    phone: '584121878834',
+    user_type_id: 1,
+    is_active: true,
+    password: await hashPassword('StudentUPEL2025!')
+  });
+
+  // Usuario Professor
+  users.push({
+    ci: '11111111',
+    username: 'professor',
+    first_name: 'Professor',
+    last_name: 'UPEL',
+    email: 'professor@upel.edu.ve',
+    phone: '584121878837',
+    user_type_id: 2,
+    is_active: true,
+    password: await hashPassword('ProfessorUPEL2025!')
+  });
+
+
 
   return users;
 };
@@ -110,7 +138,7 @@ async function seedUsers() {
     for (const user of fakeUsers) {
       await client.query(`
         INSERT INTO upel_library.users (
-          ci, username, first_name, last_name, email, phone, user_type, is_active, password
+          ci, username, first_name, last_name, email, phone, user_type_id, is_active, password
         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
         ON CONFLICT (email) DO NOTHING`,
         [
@@ -120,7 +148,7 @@ async function seedUsers() {
           user.last_name, 
           user.email,
           user.phone, 
-          user.user_type, 
+          user.user_type_id, 
           user.is_active, 
           user.password
         ]

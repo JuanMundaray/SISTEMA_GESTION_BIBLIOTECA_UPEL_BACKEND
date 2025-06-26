@@ -51,11 +51,30 @@ const swaggerDefinition = {
   servers: [
     { url: 'http://localhost:5000/api' }
   ],
+  components: {
+    securitySchemes: {
+      bearerAuth: {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT'
+      }
+    }
+  }
 };
 
 const options = {
   swaggerDefinition,
-  apis: ['./swagger/user.yaml'],
+  apis: [
+    './swagger/user.yaml',
+    './swagger/book.yaml',
+    './swagger/bookCopy.yaml',
+    './swagger/checkout.yaml',
+    './swagger/digitalResources.yaml',
+    './swagger/fine.yaml',
+    './swagger/hold.yaml',
+    './swagger/space.yaml',
+    './swagger/spaceReservation.yaml',
+  ],
 };
 
 const swaggerSpec = swaggerJSDoc(options);

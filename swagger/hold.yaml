@@ -4,33 +4,61 @@ info:
   version: 1.0.0
   description: Documentación de la API de gestión de reservas (holds) de la biblioteca UPEL
 servers:
-  - url: http://localhost:3000
+  - url: http://localhost:5000
 paths:
   /holds:
     get:
       summary: Obtener todas las reservas
       tags: [Holds]
+      security:
+        - bearerAuth: []
       responses:
         200:
           description: Lista de reservas
     post:
       summary: Crear una nueva reserva
       tags: [Holds]
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/HoldInput'
+            example:
+              book_id: 1
+              user_id: 2
+              expiry_date: '2025-07-01'
+              status: pending
       responses:
         201:
           description: Reserva creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HoldInput'
+              example:
+                book_id: 1
+                user_id: 2
+                expiry_date: '2025-07-01'
+                status: pending
         400:
           description: Error de validación
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Datos inválidos"
+                field: "book_id"
+                code: "VALIDATION_ERROR"
   /holds/{id}:
     get:
       summary: Obtener una reserva por ID
       tags: [Holds]
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -45,6 +73,8 @@ paths:
     put:
       summary: Actualizar una reserva
       tags: [Holds]
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -67,6 +97,8 @@ paths:
     delete:
       summary: Eliminar una reserva
       tags: [Holds]
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -89,20 +121,51 @@ components:
       properties:
         book_id:
           type: integer
+          description: ID del libro a reservar
+          example: 1
         user_id:
           type: integer
+          description: ID del usuario que reserva
+          example: 2
         expiry_date:
           type: string
           format: date
+          description: Fecha de expiración de la reserva (YYYY-MM-DD)
+          example: '2025-07-01'
         status:
           type: string
           enum: [pending, fulfilled, cancelled]
+          description: Estado de la reserva
+          example: pending
     HoldUpdate:
       type: object
       properties:
         expiry_date:
           type: string
           format: date
+          description: Nueva fecha de expiración (YYYY-MM-DD)
+          example: '2025-07-10'
         status:
           type: string
           enum: [pending, fulfilled, cancelled]
+          description: Nuevo estado de la reserva
+          example: fulfilled
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Mensaje de error
+        field:
+          type: string
+          description: Campo que causó el error (si aplica)
+        code:
+          type: string
+          description: Código de error
+security:
+  - bearerAuth: []
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT

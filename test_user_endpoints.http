@@ -10,7 +10,7 @@ curl -X POST http://localhost:3000/api/users/ \
     "username": "juanp",
     "email": "juan.perez@example.com",
     "phone": "+584121234567",
-    "user_type": "admin",
+    "user_type_id": "admin",
     "password": "Password123!"
   }'
 
@@ -39,7 +39,7 @@ curl -X PUT http://localhost:3000/api/users/12345678 \
     "last_name": "Pérez",
     "username": "juanp",
     "phone": "+584121234567",
-    "user_type": "admin",
+    "user_type_id": 3,
     "is_active": true
   }'
 
