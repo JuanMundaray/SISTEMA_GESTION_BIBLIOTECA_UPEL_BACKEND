@@ -241,6 +241,8 @@ paths:
       responses:
         201:
           description: Usuario restaurado
+        400:
+          description: El usuario no está eliminado o ya está activo
         404:
           description: Usuario no encontrado
         403:
