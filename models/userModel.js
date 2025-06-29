@@ -24,7 +24,7 @@ const UserModel = {
   // Buscar por CI
   async findByCI(ci) {
     const result = await pool.query(
-      'SELECT * FROM upel_library.users WHERE ci = $1 AND deleted_at IS NULL',
+      'SELECT * FROM upel_library.users WHERE ci = $1',
       [ci]
     );
     return result.rows[0];
@@ -82,7 +82,7 @@ const UserModel = {
     const result = await pool.query(
       `UPDATE upel_library.users 
        SET deleted_at = NULL, is_active = true 
-       WHERE ci = $1 
+       WHERE ci = $1 AND deleted_at<>NULL
        RETURNING ci, username, email`,
       [ci]
     );

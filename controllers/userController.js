@@ -111,7 +111,7 @@ const findByCiUser = async (req, res) => {
       const { ci } = req.params;
       const user = await UserModel.findByCI(ci);
 
-      if (!user) {
+      if ((!user) || (user.is_active == false)) {
         return res.status(404).json({ message: 'Usuario no encontrado' });
       }
 
@@ -181,10 +181,15 @@ const findByCiUser = async (req, res) => {
     try {
       const { ci } = req.params;
 
-      // Verificar si el usuario existe y está eliminado
+      // Verificar si el usuario existe
       const existingUser = await UserModel.findByCI(ci);
       if (!existingUser) {
         return res.status(404).json({ message: 'Usuario no encontrado' });
+      }
+
+      // Verificar si el usuario ya está activo
+      if (existingUser.is_active) {
+        return res.status(400).json({ message: 'El usuario no está eliminado o ya está activo.' });
       }
 
       // Restaurar el usuario
