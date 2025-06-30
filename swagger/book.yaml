@@ -8,13 +8,85 @@ servers:
 paths:
   /book:
     get:
-      summary: Obtener todos los libros
+      summary: Obtener todos los libros (paginado opcional)
       tags: [Books]
       security:
         - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: Número de página (opcional)
+          example: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          description: Cantidad de libros por página (opcional)
+          example: 10
       responses:
         200:
-          description: Lista de libros
+          description: Lista de libros (paginada si se usan page y limit)
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/BookInput'
+                  - type: object
+                    properties:
+                      books:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/BookInput'
+                      pagination:
+                        type: object
+                        properties:
+                          total:
+                            type: integer
+                            example: 100
+                          page:
+                            type: integer
+                            example: 1
+                          pages:
+                            type: integer
+                            example: 10
+                          limit:
+                            type: integer
+                            example: 10
+              examples:
+                paginada:
+                  summary: Respuesta paginada
+                  value:
+                    books:
+                      - title: "Cien años de soledad"
+                        author: "Gabriel García Márquez"
+                        isbn: "978-0307474728"
+                        publisher: "Editorial Sudamericana"
+                        publication_year: 1967
+                        edition: "Primera"
+                        language: "Español"
+                        description: "Novela emblemática de la literatura latinoamericana."
+                        academic_program_id: 1
+                    pagination:
+                      total: 100
+                      page: 1
+                      pages: 10
+                      limit: 10
+                sin_paginacion:
+                  summary: Respuesta sin paginación
+                  value:
+                    - title: "Cien años de soledad"
+                      author: "Gabriel García Márquez"
+                      isbn: "978-0307474728"
+                      publisher: "Editorial Sudamericana"
+                      publication_year: 1967
+                      edition: "Primera"
+                      language: "Español"
+                      description: "Novela emblemática de la literatura latinoamericana."
+                      academic_program_id: 1
     post:
       summary: Crear un nuevo libro
       tags: [Books]
@@ -27,15 +99,14 @@ paths:
             schema:
               $ref: '#/components/schemas/BookInput'
             example:
-              title: "Cien años de soledad"
-              author: "Gabriel García Márquez"
-              isbn: "978-0307474728"
-              publisher: "Editorial Sudamericana"
-              publication_year: 1967
-              edition: "Primera"
-              language: "Español"
-              description: "Novela emblemática de la literatura latinoamericana."
-              academic_program_id: 1
+                title: "Cien años de soledad"
+                author: "Gabriel García Márquez"
+                isbn: "978-0307474728"
+                publisher: "Editorial Sudamericana"
+                publication_year: 1967
+                edition: "Primera"
+                category: "Física"
+                description: "Novela emblemática de la literatura latinoamericana."
       responses:
         201:
           description: Libro creado
@@ -50,9 +121,8 @@ paths:
                 publisher: "Editorial Sudamericana"
                 publication_year: 1967
                 edition: "Primera"
-                language: "Español"
+                category: "Física"
                 description: "Novela emblemática de la literatura latinoamericana."
-                academic_program_id: 1
         400:
           description: Error de validación
           content:
@@ -63,25 +133,95 @@ paths:
                 message: "Datos inválidos"
                 field: "isbn"
                 code: "VALIDATION_ERROR"
-  /book/{id}:
+        403:
+          description: Acceso denegado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Acceso denegado solo administradores.
+  /book/{isbn}:
     get:
-      summary: Obtener un libro por ID
+      summary: Buscar libro por ISBN
       tags: [Books]
       security:
         - bearerAuth: []
       parameters:
-        - name: id
+        - name: isbn
           in: path
           required: true
           schema:
-            type: integer
+            type: string
+          description: ISBN del libro a buscar
       responses:
         200:
           description: Libro encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookInput'
+              example:
+                title: "Cien años de soledad"
+                author: "Gabriel García Márquez"
+                isbn: "978-0307474728"
+                publisher: "Editorial Sudamericana"
+                publication_year: 1967
+                edition: "Primera"
+                language: "Español"
+                description: "Novela emblemática de la literatura latinoamericana."
+                academic_program_id: 1
         404:
           description: Libro no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Libro no encontrado"
+  /book/{title}:
+    get:
+      summary: Buscar libro por título
+      tags: [Books]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: title
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Título del libro a buscar
+      responses:
+        200:
+          description: Libro encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookInput'
+              example:
+                title: "Cien años de soledad"
+                author: "Gabriel García Márquez"
+                isbn: "978-0307474728"
+                publisher: "Editorial Sudamericana"
+                publication_year: 1967
+                edition: "Primera"
+                language: "Español"
+                description: "Novela emblemática de la literatura latinoamericana."
+                academic_program_id: 1
+        404:
+          description: Libro no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Libro no encontrado"
+  /book/{id}:
     put:
-      summary: Actualizar un libro
+      summary: Actualizar un libro (permite actualización parcial o completa)
       tags: [Books]
       security:
         - bearerAuth: []
@@ -96,14 +236,76 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BookInput'
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: Título del libro
+                author:
+                  type: string
+                  description: Autor del libro
+                publisher:
+                  type: string
+                  description: Editorial
+                publication_year:
+                  type: integer
+                  description: Año de publicación
+                category:
+                  type: string
+                  description: Categoría
+                edition:
+                  type: string
+                  description: Edición
+                description:
+                  type: string
+                  description: Descripción del libro
+                is_available:
+                  type: boolean
+                  description: Disponibilidad
+                cover_url:
+                  type: string
+                  description: URL de la portada
+            examples:
+              actualizacion_parcial:
+                summary: Solo se actualiza el título y la disponibilidad
+                value:
+                  title: "Nuevo título"
+                  is_available: false
+              actualizacion_completa:
+                summary: Todos los campos actualizados
+                value:
+                  title: "Programación Avanzada"
+                  author: "Juan Pérez"
+                  publisher: "Editorial UPEL"
+                  publication_year: 2024
+                  category: "Informática"
+                  edition: "Tercera"
+                  description: "Libro actualizado con todos los datos."
+                  is_available: true
+                  cover_url: "https://biblioteca.upel.edu.ve/covers/programacion-avanzada.jpg"
       responses:
         200:
           description: Libro actualizado
         400:
-          description: Error de validación
+          description: Error de validación o campos no válidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Campos no válidos: foo, bar"
         404:
           description: Libro no encontrado
+        403:
+          description: Acceso denegado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Acceso denegado solo administradores.
     delete:
       summary: Eliminar un libro
       tags: [Books]
@@ -120,6 +322,16 @@ paths:
           description: Libro eliminado
         404:
           description: Libro no encontrado
+        403:
+          description: Acceso denegado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Acceso denegado solo administradores.
 components:
   schemas:
     BookInput:

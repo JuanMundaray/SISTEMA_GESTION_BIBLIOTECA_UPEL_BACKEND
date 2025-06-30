@@ -49,6 +49,7 @@ CREATE TABLE upel_library.books (
     publication_year INT,
     category VARCHAR(50) NOT NULL, -- e.g., "Engineering", "Medicine"
     edition VARCHAR(20),
+    description TEXT,
     is_available BOOLEAN DEFAULT TRUE,
     cover_url VARCHAR(255), -- Link to image/PDF
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),

@@ -3,22 +3,34 @@ const pool = require('../config/db');
 
 const Book = {
   // Crear un libro
-  async create({ isbn, title, author, publisher, publication_year, category, edition, is_available, cover_url }) {
+  async create({ isbn, title, author, publisher, publication_year, category, edition, description, is_available, cover_url }) {
     const result = await pool.query(
       `
-        INSERT INTO upel_library.books (isbn, title, author, publisher, publication_year, category, edition, is_available, cover_url)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        INSERT INTO upel_library.books (isbn, title, author, publisher, publication_year, category, edition, description, is_available, cover_url)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
         RETURNING *;
       `,
-      [isbn, title, author, publisher, publication_year, category, edition, is_available, cover_url]
+      [isbn, title, author, publisher, publication_year, category, edition, description, is_available, cover_url]
     );
     return result.rows[0];
   },
 
-  // Obtener todos los libros
-  async findAll() {
-    const result = await pool.query('SELECT * FROM upel_library.books');
-    return result.rows;
+  // Obtener todos los libros, opcionalmente paginados
+  async findAll({ limit, offset } = {}) {
+    if (typeof limit === 'number' && typeof offset === 'number') {
+      const result = await pool.query(
+        'SELECT * FROM upel_library.books ORDER BY book_id LIMIT $1 OFFSET $2',
+        [limit, offset]
+      );
+      const countResult = await pool.query('SELECT COUNT(*) FROM upel_library.books');
+      return {
+        books: result.rows,
+        total: parseInt(countResult.rows[0].count, 10)
+      };
+    } else {
+      const result = await pool.query('SELECT * FROM upel_library.books ORDER BY book_id');
+      return result.rows;
+    }
   },
 
   // Buscar por ID
@@ -33,17 +45,41 @@ const Book = {
     return result.rows[0];
   },
 
-  // Actualizar un libro
-  async update(book_id, { title, author, publisher, publication_year, category, edition, is_available, cover_url }) {
-    const result = await pool.query(
-      `
-        UPDATE upel_library.books
-        SET title = $1, author = $2, publisher = $3, publication_year = $4, category = $5, edition = $6, is_available = $7, cover_url = $8, updated_at = NOW()
-        WHERE book_id = $9
-        RETURNING *;
-      `,
-      [title, author, publisher, publication_year, category, edition, is_available, cover_url, book_id]
-    );
+  // Actualizar un libro (actualización parcial)
+  async update(book_id, fields) {
+    // Filtrar solo los campos definidos
+    const allowedFields = [
+      'title', 'author', 'publisher', 'publication_year', 'category', 'edition', 'description', 'is_available', 'cover_url'
+    ];
+    const updates = [];
+    const values = [];
+    let idx = 1;
+    const invalidFields = Object.keys(fields).filter(key => !allowedFields.includes(key));
+    if (invalidFields.length > 0) {
+      // Si hay campos inválidos, devolver error
+      return { error: `Campos no válidos: ${invalidFields.join(', ')}` };
+    }
+    for (const key of allowedFields) {
+      if (fields[key] !== undefined) {
+        updates.push(`${key} = $${idx}`);
+        values.push(fields[key]);
+        idx++;
+      }
+    }
+    if (updates.length === 0) {
+      // No hay campos para actualizar
+      return null;
+    }
+    // Siempre actualiza updated_at
+    updates.push(`updated_at = NOW()`);
+    const query = `
+      UPDATE upel_library.books
+      SET ${updates.join(', ')}
+      WHERE book_id = $${idx}
+      RETURNING *;
+    `;
+    values.push(book_id);
+    const result = await pool.query(query, values);
     return result.rows[0];
   },
 
