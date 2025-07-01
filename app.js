@@ -6,6 +6,7 @@ const corsOptions = require('./config/corsOptions');
 const authMiddleware = require('./middlewares/authenticateToken');
 const  { limiter } = require('./config/rateLimiting');
 const routesBooks = require('./routes/bookRoutes');
+const routesBooksCppies = require('./routes/bookCopyRoutes');
 const routesUsers = require('./routes/userRoutes');
 const routesSpaces = require('./routes/spaceRoutes');
 const routesSpaceReservations = require('./routes/spaceReservationRoutes');
@@ -34,6 +35,7 @@ app.get('/', (res,req)=>{
 });
 
 app.use('/api/book',routesBooks);
+app.use('/api/book-copies',routesBooksCppies);
 app.use('/api/users',routesUsers);
 app.use('/api/spaces', routesSpaces);
 app.use('/api/space-reservations', routesSpaceReservations);

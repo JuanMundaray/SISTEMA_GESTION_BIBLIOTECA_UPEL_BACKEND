@@ -4,18 +4,22 @@ info:
   version: 1.0.0
   description: Documentación de la API de gestión de préstamos (checkouts) de la biblioteca UPEL
 servers:
-  - url: http://localhost:3000
+  - url: http://localhost:5000/api
 paths:
   /checkouts:
     get:
       summary: Obtener todos los préstamos
       tags: [Checkouts]
+      security:
+        - bearerAuth: []
       responses:
         200:
           description: Lista de préstamos
     post:
       summary: Crear un nuevo préstamo
       tags: [Checkouts]
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -31,6 +35,8 @@ paths:
     get:
       summary: Obtener un préstamo por ID
       tags: [Checkouts]
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -45,6 +51,8 @@ paths:
     put:
       summary: Actualizar un préstamo
       tags: [Checkouts]
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -67,6 +75,8 @@ paths:
     delete:
       summary: Eliminar un préstamo
       tags: [Checkouts]
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -104,3 +114,8 @@ components:
           type: string
         fine_amount:
           type: number
+    securitySchemes:
+      bearerAuth:
+        type: http
+        scheme: bearer
+        bearerFormat: JWT

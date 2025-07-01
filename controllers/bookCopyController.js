@@ -5,8 +5,21 @@ const createBookCopy = async (req, res) => {
     const { book_id, barcode, location, status } = req.body;
     const copy = await BookCopy.create({ book_id, barcode, location, status });
     res.status(201).json(copy);
-  } catch (error) {
-    res.status(500).json({ error: 'Error al crear la copia del libro' });
+  } 
+  catch (error) {
+    if (error.code === '23503') {
+      // Violación de clave foránea: el libro no existe
+      return res.status(404).json({ error: 'No existe un libro con ese ID' });
+    }
+    if (error.code === '23505') {
+      // Violación de clave única: el código de barras ya existe
+      return res.status(400).json({ error: 'El código de barras ya existe' });
+    }
+    res.status(500).json(
+      {
+        error: 'Error al crear la copia del libro',
+        details: error.message
+    });
   }
 };
 
@@ -38,7 +51,15 @@ const updateBookCopy = async (req, res) => {
     if (!copy) return res.status(404).json({ error: 'Copia no encontrada' });
     res.json(copy);
   } catch (error) {
-    res.status(500).json({ error: 'Error al actualizar la copia del libro' });
+    if (error.code === '23514') {
+      return res.status(400).json({ error: 'Los únicos estados disponibles para un libro son: available, checked_out, under_maintenance' });
+    }
+    res.status(500).json(
+      {
+        error: 'Error al actualizar la copia del libro',
+        details: error.message,
+        code: error.code
+    });
   }
 };
 
