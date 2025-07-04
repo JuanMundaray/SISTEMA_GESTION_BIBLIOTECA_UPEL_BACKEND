@@ -7,15 +7,39 @@ const requireAdmin = require('../middlewares/requireAdmin');
 const { validate } = require('../validators/validator');
 const digitalResourceSchema = require('../schema/digitalResourceSchema');
 
-// Public: List all digital resources
+/**
+ * @route GET /digital-resources
+ * @desc Obtener todos los recursos digitales
+ * @access Público
+ */
 router.get('/', digitalResourceController.getResources);
-// Public: Get digital resource by ID
+
+/**
+ * @route GET /digital-resources/:id
+ * @desc Obtener un recurso digital por ID
+ * @access Público
+ */
 router.get('/:id', digitalResourceController.getResourceById);
-// Protected: Create digital resource (admin only)
+
+/**
+ * @route POST /digital-resources
+ * @desc Crear un nuevo recurso digital
+ * @access Admin (requiere autenticación)
+ */
 router.post('/', authenticateToken, requireAdmin, validate(digitalResourceSchema), digitalResourceController.createResource);
-// Protected: Update digital resource (admin only)
+
+/**
+ * @route PUT /digital-resources/:id
+ * @desc Actualizar un recurso digital
+ * @access Admin (requiere autenticación)
+ */
 router.put('/:id', authenticateToken, requireAdmin, validate(digitalResourceSchema), digitalResourceController.updateResource);
-// Protected: Delete digital resource (admin only)
+
+/**
+ * @route DELETE /digital-resources/:id
+ * @desc Eliminar un recurso digital
+ * @access Admin (requiere autenticación)
+ */
 router.delete('/:id', authenticateToken, requireAdmin, digitalResourceController.deleteResource);
 
 module.exports = router;

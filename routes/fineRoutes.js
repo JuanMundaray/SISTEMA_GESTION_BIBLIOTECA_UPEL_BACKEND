@@ -10,17 +10,46 @@ const RequireAdmin = require('../middlewares/requireAdmin');
 
 router.use(RequireAdmin);
 
-// Public: List all fines
+/**
+ * @route GET /fines
+ * @desc Obtener todas las multas
+ * @access Admin
+ */
 router.get('/', fineController.getFines);
-// Public: Get fine by ID
+
+/**
+ * @route GET /fines/:id
+ * @desc Obtener una multa por ID
+ * @access Admin
+ */
 router.get('/:id', fineController.getFineById);
-// Obtener todos los datos completos de una multa por su ID
+
+/**
+ * @route GET /fines/full/:id
+ * @desc Obtener todos los datos completos de una multa por su ID (incluye usuario y préstamo)
+ * @access Admin
+ */
 router.get('/full/:id', fineController.getFineFullById);
-// Protected: Create fine (admin only)
+
+/**
+ * @route POST /fines
+ * @desc Crear una nueva multa
+ * @access Admin (requiere autenticación)
+ */
 router.post('/', authenticateToken, requireAdmin, validate(fineSchema), fineController.createFine);
-// Protected: Update fine (admin only)
+
+/**
+ * @route PUT /fines/:id
+ * @desc Actualizar una multa
+ * @access Admin (requiere autenticación)
+ */
 router.put('/:id', authenticateToken, requireAdmin, fineController.updateFine);
-// Protected: Delete fine (admin only)
+
+/**
+ * @route DELETE /fines/:id
+ * @desc Eliminar una multa
+ * @access Admin (requiere autenticación)
+ */
 router.delete('/:id', authenticateToken, requireAdmin, fineController.deleteFine);
 
 module.exports = router;

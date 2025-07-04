@@ -75,9 +75,8 @@ const options = {
     './swagger/checkout.yaml',
     './swagger/digitalResources.yaml',
     './swagger/fine.yaml',
-    './swagger/hold.yaml',
     './swagger/space.yaml',
-    './swagger/spaceReservation.yaml',
+    './swagger/spaceReservation.yaml'
   ],
 };
 

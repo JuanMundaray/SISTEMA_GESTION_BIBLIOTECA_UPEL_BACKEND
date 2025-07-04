@@ -6,6 +6,14 @@ const createReservation = async (req, res) => {
     const reservation = await SpaceReservation.create({ space_id, user_id, start_time, end_time, purpose });
     res.status(201).json(reservation);
   } catch (error) {
+    if(error.code === '23503'){
+      if(error.detail.includes('space_id')) {
+        return res.status(404).json({ error: 'El espacio no existe' });
+      }
+      if(error.detail.includes('user_id')) {
+        return res.status(404).json({ error: 'El usuario no existe' });
+      }
+    }
     res.status(500).json({ error: 'Error al crear la reserva de espacio' });
   }
 };

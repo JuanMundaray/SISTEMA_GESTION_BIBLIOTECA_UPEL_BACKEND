@@ -4,17 +4,45 @@ const router = express.Router();
 const spaceReservationController = require('../controllers/spaceReservationController');
 const authenticateToken = require('../middlewares/authenticateToken');
 const { validate } = require('../validators/validator');
-const spaceReservationSchema = require('../schema/spaceReservationSchema');
 
-// Public: List all reservations
+const {
+    spaceReservationSchema,
+    spaceReservationUpdateSchema
+} = require('../schema/spaceReservationSchema');
+
+/**
+ * @route GET /space-reservations
+ * @desc Obtener todas las reservas de espacios
+ * @access Público
+ */
 router.get('/', spaceReservationController.getReservations);
-// Public: Get reservation by ID
+
+/**
+ * @route GET /space-reservations/:id
+ * @desc Obtener una reserva de espacio por ID
+ * @access Público
+ */
 router.get('/:id', spaceReservationController.getReservationById);
-// Protected: Create reservation (authenticated users)
+
+/**
+ * @route POST /space-reservations
+ * @desc Crear una nueva reserva de espacio
+ * @access Usuario autenticado
+ */
 router.post('/', authenticateToken, validate(spaceReservationSchema), spaceReservationController.createReservation);
-// Protected: Update reservation (authenticated users)
-router.put('/:id', authenticateToken, validate(spaceReservationSchema), spaceReservationController.updateReservation);
-// Protected: Delete reservation (authenticated users)
+
+/**
+ * @route PUT /space-reservations/:id
+ * @desc Actualizar una reserva de espacio
+ * @access Usuario autenticado
+ */
+router.put('/:id', authenticateToken, validate(spaceReservationUpdateSchema), spaceReservationController.updateReservation);
+
+/**
+ * @route DELETE /space-reservations/:id
+ * @desc Eliminar una reserva de espacio
+ * @access Usuario autenticado
+ */
 router.delete('/:id', authenticateToken, spaceReservationController.deleteReservation);
 
 module.exports = router;

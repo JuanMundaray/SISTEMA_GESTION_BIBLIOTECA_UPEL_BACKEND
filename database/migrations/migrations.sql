@@ -81,19 +81,7 @@ CREATE TABLE upel_library.checkouts (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 5. TABLE holds (For unavailable books)
-CREATE TABLE upel_library.holds (
-    hold_id SERIAL PRIMARY KEY,
-    book_id INT REFERENCES books(book_id),
-    user_id INT REFERENCES users(user_id),
-    hold_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    expiry_date TIMESTAMP, -- e.g., 48 hours later
-    status VARCHAR(20) CHECK (status IN ('pending', 'fulfilled', 'cancelled')),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- 6. TABLE spaces (Study rooms/equipment)
+-- 5. TABLE spaces (Study rooms/equipment)
 CREATE TABLE upel_library.spaces (
     space_id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL, -- e.g., "Study Room A"
@@ -103,7 +91,7 @@ CREATE TABLE upel_library.spaces (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 7. TABLE space_reservations (Corrected typo from previous version)
+-- 6. TABLE space_reservations (Corrected typo from previous version)
 CREATE TABLE upel_library.space_reservations (
     reservation_id SERIAL PRIMARY KEY,
     space_id INT REFERENCES upel_library.spaces(space_id),
@@ -115,7 +103,7 @@ CREATE TABLE upel_library.space_reservations (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 8. TABLE fines
+-- 7. TABLE fines
 CREATE TABLE upel_library.fines (
     fine_id SERIAL PRIMARY KEY,
     user_id INT REFERENCES upel_library.users(user_id),
@@ -159,7 +147,7 @@ FROM upel_library.fines f
 JOIN upel_library.users u ON f.user_id = u.user_id
 JOIN upel_library.checkouts c ON f.checkout_id = c.checkout_id;
 
--- 9. TABLE digital_resources (e-books, articles)
+-- 8. TABLE digital_resources (e-books, articles)
 CREATE TABLE upel_library.digital_resources (
     resource_id SERIAL PRIMARY KEY,
     book_id INT REFERENCES upel_library.books(book_id) ON DELETE SET NULL,
@@ -185,7 +173,7 @@ CREATE INDEX idx_copies_status ON upel_library.copies(status);
 CREATE OR REPLACE FUNCTION generate_book_copy()
 RETURNS TRIGGER AS $$
 BEGIN
-    NEW. = NOW();
+    NEW.created_at = NOW();
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;

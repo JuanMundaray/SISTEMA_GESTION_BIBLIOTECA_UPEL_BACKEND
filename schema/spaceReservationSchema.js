@@ -8,4 +8,14 @@ const spaceReservationSchema = Joi.object({
   purpose: Joi.string().max(200).allow(null, '')
 });
 
-module.exports = spaceReservationSchema;
+const spaceReservationUpdateSchema = Joi.object({
+  start_time: Joi.date().iso().optional(),
+  end_time: Joi.date().iso().optional(),
+  purpose: Joi.string().max(200).allow(null, '')
+});
+
+module.exports = 
+{
+  spaceReservationSchema,
+  spaceReservationUpdateSchema
+};
