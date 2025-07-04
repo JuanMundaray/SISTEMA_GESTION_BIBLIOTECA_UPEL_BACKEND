@@ -31,6 +31,16 @@ paths:
           description: Préstamo creado
         400:
           description: Error de validación
+        409:
+          description: Ya existe un préstamo activo para esta copia. Debe devolverse antes de crear uno nuevo.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Ya existe un préstamo activo para esta copia. Debe devolverse antes de crear uno nuevo.
   /checkouts/{id}:
     get:
       summary: Obtener un préstamo por ID
@@ -88,6 +98,247 @@ paths:
           description: Préstamo eliminado
         404:
           description: Préstamo no encontrado
+  /checkouts/user/{user_id}:
+    get:
+      summary: Obtener todos los préstamos de un usuario
+      tags: [Checkouts]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID del usuario
+      responses:
+        200:
+          description: Lista de préstamos del usuario
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CheckoutInput'
+              examples:
+                ejemplo:
+                  summary: Ejemplo de préstamos de un usuario
+                  value:
+                    - copy_id: 1
+                      user_id: 10
+                      due_date: '2025-07-10'
+                      return_date: null
+                      status: active
+                      fine_amount: 0
+                    - copy_id: 2
+                      user_id: 10
+                      due_date: '2025-06-01'
+                      return_date: '2025-06-10'
+                      status: returned
+                      fine_amount: 0
+        404:
+          description: Usuario no encontrado o sin préstamos
+  /checkouts/copy/{copy_id}:
+    get:
+      summary: Obtener todos los préstamos de una copia
+      tags: [Checkouts]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: copy_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID de la copia
+      responses:
+        200:
+          description: Lista de préstamos de la copia
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CheckoutInput'
+              examples:
+                ejemplo:
+                  summary: Ejemplo de préstamos de una copia
+                  value:
+                    - copy_id: 5
+                      user_id: 12
+                      due_date: '2025-07-15'
+                      return_date: null
+                      status: active
+                      fine_amount: 0
+                    - copy_id: 5
+                      user_id: 8
+                      due_date: '2025-05-01'
+                      return_date: '2025-05-10'
+                      status: returned
+                      fine_amount: 0
+        404:
+          description: Copia no encontrada o sin préstamos
+  /checkouts/full:
+    get:
+      summary: Obtener todos los préstamos con datos completos de usuario, copia y libro
+      tags: [Checkouts]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Lista de préstamos enriquecidos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CheckoutFull'
+              examples:
+                ejemplo:
+                  summary: Ejemplo de préstamo enriquecido
+                  value:
+                    - checkout_id: 1
+                      copy_id: 5
+                      user_id: 10
+                      checkout_date: '2025-07-01'
+                      due_date: '2025-07-10'
+                      return_date: null
+                      status: active
+                      fine_amount: 0
+                      created_at: '2025-07-01T10:00:00Z'
+                      updated_at: '2025-07-01T10:00:00Z'
+                      user_ci: '12345678'
+                      user_username: 'jdoe'
+                      user_first_name: 'Juan'
+                      user_last_name: 'Doe'
+                      user_email: 'jdoe@upel.edu.ve'
+                      user_phone: '04141234567'
+                      user_type_id: 1
+                      copy_barcode: 'LIB-2023-005'
+                      copy_location: 'Estante A2'
+                      copy_status: 'checked_out'
+                      copy_book_id: 3
+                      book_isbn: '978-9876543210'
+                      book_title: 'Introducción a la Ingeniería'
+                      book_author: 'A. Pérez'
+                      book_publisher: 'Editorial UPEL'
+                      book_publication_year: 2022
+                      book_category: 'Ingeniería'
+                      book_edition: '2da'
+                      book_description: 'Libro base para estudiantes de ingeniería.'
+                      book_cover_url: 'https://upel.edu.ve/portada.jpg'
+        500:
+          description: Error interno al obtener los préstamos completos
+  /checkouts/full/{id}:
+    get:
+      summary: Obtener un préstamo enriquecido por ID (usuario, copia y libro)
+      tags: [Checkouts]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID del préstamo
+      responses:
+        200:
+          description: Préstamo enriquecido encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckoutFull'
+              examples:
+                ejemplo:
+                  summary: Ejemplo de préstamo enriquecido
+                  value:
+                    checkout_id: 1
+                    copy_id: 5
+                    user_id: 10
+                    checkout_date: '2025-07-01'
+                    due_date: '2025-07-10'
+                    return_date: null
+                    status: active
+                    fine_amount: 0
+                    created_at: '2025-07-01T10:00:00Z'
+                    updated_at: '2025-07-01T10:00:00Z'
+                    user_ci: '12345678'
+                    user_username: 'jdoe'
+                    user_first_name: 'Juan'
+                    user_last_name: 'Doe'
+                    user_email: 'jdoe@upel.edu.ve'
+                    user_phone: '04141234567'
+                    user_type_id: 1
+                    copy_barcode: 'LIB-2023-005'
+                    copy_location: 'Estante A2'
+                    copy_status: 'checked_out'
+                    copy_book_id: 3
+                    book_isbn: '978-9876543210'
+                    book_title: 'Introducción a la Ingeniería'
+                    book_author: 'A. Pérez'
+                    book_publisher: 'Editorial UPEL'
+                    book_publication_year: 2022
+                    book_category: 'Ingeniería'
+                    book_edition: '2da'
+                    book_description: 'Libro base para estudiantes de ingeniería.'
+                    book_cover_url: 'https://upel.edu.ve/portada.jpg'
+        404:
+          description: Préstamo no encontrado
+        500:
+          description: Error interno al obtener el préstamo completo
+  /checkouts/{id}/return:
+    put:
+      summary: Procesar la devolución de un préstamo
+      tags: [Checkouts]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID del préstamo a devolver
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                return_date:
+                  type: string
+                  format: date
+                  description: Fecha de devolución (opcional, por defecto hoy)
+      responses:
+        200:
+          description: Préstamo devuelto correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  checkout:
+                    $ref: '#/components/schemas/CheckoutInput'
+              examples:
+                ejemplo:
+                  summary: Ejemplo de devolución exitosa
+                  value:
+                    message: Préstamo devuelto correctamente
+                    checkout:
+                      checkout_id: 1
+                      copy_id: 5
+                      user_id: 10
+                      due_date: '2025-07-10'
+                      return_date: '2025-07-05'
+                      status: returned
+        404:
+          description: Préstamo no encontrado o ya devuelto
+        500:
+          description: Error al procesar la devolución
 components:
   schemas:
     CheckoutInput:
@@ -114,6 +365,75 @@ components:
           type: string
         fine_amount:
           type: number
+    CheckoutFull:
+      type: object
+      properties:
+        checkout_id:
+          type: integer
+        copy_id:
+          type: integer
+        user_id:
+          type: integer
+        checkout_date:
+          type: string
+          format: date
+        due_date:
+          type: string
+          format: date
+        return_date:
+          type: string
+          format: date
+          nullable: true
+        status:
+          type: string
+        fine_amount:
+          type: number
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        user_ci:
+          type: string
+        user_username:
+          type: string
+        user_first_name:
+          type: string
+        user_last_name:
+          type: string
+        user_email:
+          type: string
+        user_phone:
+          type: string
+        user_type_id:
+          type: integer
+        copy_barcode:
+          type: string
+        copy_location:
+          type: string
+        copy_status:
+          type: string
+        copy_book_id:
+          type: integer
+        book_isbn:
+          type: string
+        book_title:
+          type: string
+        book_author:
+          type: string
+        book_publisher:
+          type: string
+        book_publication_year:
+          type: integer
+        book_category:
+          type: string
+        book_edition:
+          type: string
+        book_description:
+          type: string
+        book_cover_url:
+          type: string
     securitySchemes:
       bearerAuth:
         type: http

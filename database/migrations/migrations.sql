@@ -73,7 +73,7 @@ CREATE TABLE upel_library.checkouts (
     copy_id INT REFERENCES copies(copy_id),
     user_id INT REFERENCES users(user_id),
     checkout_date DATE NOT NULL DEFAULT CURRENT_DATE,
-    due_date DATE NOT NULL, -- Calculated based on user_type
+    due_date DATE NOT NULL,
     return_date DATE,
     status VARCHAR(20) CHECK (status IN ('active', 'returned', 'overdue', 'lost')),
     fine_amount DECIMAL(10, 2) DEFAULT 0.00,
@@ -152,6 +152,15 @@ CREATE INDEX idx_checkouts_status ON upel_library.checkouts(status);
 CREATE INDEX idx_copies_status ON upel_library.copies(status);
 
 -- Create function to update timestamps
+CREATE OR REPLACE FUNCTION generate_book_copy()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW. = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create function to update timestamps
 CREATE OR REPLACE FUNCTION update_timestamp()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -192,3 +201,63 @@ FOR EACH ROW EXECUTE FUNCTION update_timestamp();
 CREATE TRIGGER update_digital_resources_timestamp
 BEFORE UPDATE ON upel_library.digital_resources
 FOR EACH ROW EXECUTE FUNCTION update_timestamp();
+
+-- View: upel_library.vw_checkouts_full
+CREATE OR REPLACE VIEW upel_library.vw_checkouts_full AS
+SELECT 
+    c.checkout_id,
+    c.copy_id,
+    c.user_id,
+    c.checkout_date,
+    c.due_date,
+    c.return_date,
+    c.status,
+    c.fine_amount,
+    c.created_at,
+    c.updated_at,
+    u.ci AS user_ci,
+    u.username AS user_username,
+    u.first_name AS user_first_name,
+    u.last_name AS user_last_name,
+    u.email AS user_email,
+    u.phone AS user_phone,
+    u.user_type_id AS user_type_id,
+    cp.barcode AS copy_barcode,
+    cp.location AS copy_location,
+    cp.status AS copy_status,
+    cp.book_id AS copy_book_id,
+    b.isbn AS book_isbn,
+    b.title AS book_title,
+    b.author AS book_author,
+    b.publisher AS book_publisher,
+    b.publication_year AS book_publication_year,
+    b.category AS book_category,
+    b.edition AS book_edition,
+    b.description AS book_description,
+    b.cover_url AS book_cover_url
+FROM upel_library.checkouts c
+JOIN upel_library.users u ON c.user_id = u.user_id
+JOIN upel_library.copies cp ON c.copy_id = cp.copy_id
+JOIN upel_library.books b ON cp.book_id = b.book_id;
+
+-- View: upel_library.vw_copies_full
+CREATE OR REPLACE VIEW upel_library.vw_copies_full AS
+SELECT 
+    cp.copy_id,
+    cp.book_id,
+    cp.barcode,
+    cp.location,
+    cp.status AS copy_status,
+    cp.created_at AS copy_created_at,
+    cp.updated_at AS copy_updated_at,
+    b.isbn AS book_isbn,
+    b.title AS book_title,
+    b.author AS book_author,
+    b.publisher AS book_publisher,
+    b.publication_year AS book_publication_year,
+    b.category AS book_category,
+    b.edition AS book_edition,
+    b.description AS book_description,
+    b.cover_url AS book_cover_url
+FROM upel_library.copies cp
+JOIN upel_library.books b ON cp.book_id = b.book_id;
