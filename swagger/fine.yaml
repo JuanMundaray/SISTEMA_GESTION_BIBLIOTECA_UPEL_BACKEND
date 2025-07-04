@@ -4,18 +4,22 @@ info:
   version: 1.0.0
   description: Documentación de la API de gestión de multas de la biblioteca UPEL
 servers:
-  - url: http://localhost:3000
+  - url: http://localhost:5000/api
 paths:
   /fines:
     get:
       summary: Obtener todas las multas
       tags: [Fines]
+      security:
+        - bearerAuth: []
       responses:
         200:
           description: Lista de multas
     post:
       summary: Crear una nueva multa
       tags: [Fines]
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -31,6 +35,8 @@ paths:
     get:
       summary: Obtener una multa por ID
       tags: [Fines]
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -45,6 +51,8 @@ paths:
     put:
       summary: Actualizar una multa
       tags: [Fines]
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -67,6 +75,8 @@ paths:
     delete:
       summary: Eliminar una multa
       tags: [Fines]
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -78,7 +88,87 @@ paths:
           description: Multa eliminada
         404:
           description: Multa no encontrada
+  /fines/full/{id}:
+    get:
+      summary: Obtener todos los datos completos de una multa por ID
+      tags: [Fines]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Multa completa encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fine_id:
+                    type: integer
+                  user_id:
+                    type: integer
+                  user_ci:
+                    type: string
+                  user_username:
+                    type: string
+                  user_first_name:
+                    type: string
+                  user_last_name:
+                    type: string
+                  user_email:
+                    type: string
+                  user_phone:
+                    type: string
+                  user_type_id:
+                    type: integer
+                  checkout_id:
+                    type: integer
+                  copy_id:
+                    type: integer
+                  checkout_date:
+                    type: string
+                    format: date
+                  due_date:
+                    type: string
+                    format: date
+                  return_date:
+                    type: string
+                    format: date
+                  checkout_status:
+                    type: string
+                  checkout_fine_amount:
+                    type: number
+                  fine_amount:
+                    type: number
+                  reason:
+                    type: string
+                  issue_date:
+                    type: string
+                    format: date
+                  is_paid:
+                    type: boolean
+                  payment_date:
+                    type: string
+                    format: date-time
+                  fine_created_at:
+                    type: string
+                    format: date-time
+                  fine_updated_at:
+                    type: string
+                    format: date-time
+        404:
+          description: Multa no encontrada
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     FineInput:
       type: object

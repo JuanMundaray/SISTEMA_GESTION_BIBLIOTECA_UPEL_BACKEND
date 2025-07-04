@@ -129,6 +129,36 @@ CREATE TABLE upel_library.fines (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- View: upel_library.vw_fines_full
+CREATE OR REPLACE VIEW upel_library.vw_fines_full AS
+SELECT 
+    f.fine_id,
+    f.user_id,
+    u.ci AS user_ci,
+    u.username AS user_username,
+    u.first_name AS user_first_name,
+    u.last_name AS user_last_name,
+    u.email AS user_email,
+    u.phone AS user_phone,
+    u.user_type_id AS user_type_id,
+    f.checkout_id,
+    c.copy_id,
+    c.checkout_date,
+    c.due_date,
+    c.return_date,
+    c.status AS checkout_status,
+    c.fine_amount AS checkout_fine_amount,
+    f.amount AS fine_amount,
+    f.reason,
+    f.issue_date,
+    f.is_paid,
+    f.payment_date,
+    f.created_at AS fine_created_at,
+    f.updated_at AS fine_updated_at
+FROM upel_library.fines f
+JOIN upel_library.users u ON f.user_id = u.user_id
+JOIN upel_library.checkouts c ON f.checkout_id = c.checkout_id;
+
 -- 9. TABLE digital_resources (e-books, articles)
 CREATE TABLE upel_library.digital_resources (
     resource_id SERIAL PRIMARY KEY,

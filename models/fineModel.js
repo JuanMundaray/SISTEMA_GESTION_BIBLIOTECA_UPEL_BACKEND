@@ -17,6 +17,10 @@ const Fine = {
     const result = await pool.query('SELECT * FROM upel_library.fines WHERE fine_id = $1', [fine_id]);
     return result.rows[0];
   },
+  async findFullById(fine_id) {
+    const result = await pool.query('SELECT * FROM upel_library.vw_fines_full WHERE fine_id = $1', [fine_id]);
+    return result.rows[0];
+  },
   async update(fine_id, { amount, reason, is_paid, payment_date }) {
     const result = await pool.query(
       `UPDATE upel_library.fines SET amount = $1, reason = $2, is_paid = $3, payment_date = $4, updated_at = NOW() WHERE fine_id = $5 RETURNING *`,
